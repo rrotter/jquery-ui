@@ -98,6 +98,14 @@ $.widget("ui.selectable", $.ui.mouse, {
 				self._selecting(selectee);
 			}
 		};
+		this._revert = function(selectee){
+			if (selectee.startselected) {
+				self._selecting(selectee);
+			} else {
+				self._unselecting(selectee);
+			}
+		};
+		
 
 		this._set_ui_selectable_info = function(selectee,type,add){
 			if (selectee[type] !== add) {
@@ -192,6 +200,13 @@ $.widget("ui.selectable", $.ui.mouse, {
 
 		var options = this.options;
 
+		// find top selectee ancestor of event.target
+		var target = $(event.target).parents().andSelf().filter(".ui-selectee").first();
+		var selectee = target.data("selectable-item");
+		if(target.hasClass('ui-selected')){
+			selectee.startselected = true;
+		}
+
 		var x1 = this.opos[0], y1 = this.opos[1], x2 = event.pageX, y2 = event.pageY;
 		if (x1 > x2) { var tmp = x2; x2 = x1; x1 = tmp; }
 		if (y1 > y2) { var tmp = y2; y2 = y1; y1 = tmp; }
@@ -210,22 +225,16 @@ $.widget("ui.selectable", $.ui.mouse, {
 			}
 
 			if (hit) {
-				/// selecting
-				self._selecting(selectee);
-			} else {
-				/// if selecting unselecting, unless meta and startselected
-				if (selectee.selecting) {
-					if ((event.metaKey || event.ctrlKey) && selectee.startselected) {
-						self._select(selectee,true);
-					} else {
-						self._unselecting(selectee);
-					}
+				if (self.meta) {
+					self._invert(selectee);
+				} else {
+					self._selecting(selectee);
 				}
-				/// leave selected alone if they started that way or meta
-				if (selectee.selected) {
-					if (!event.metaKey && !event.ctrlKey && !selectee.startselected) {
-						self._unselecting(selectee);
-					}
+			} else {
+				if (self.meta) {
+					self._revert(selectee);
+				} else {
+					self._unselecting(selectee);
 				}
 			}
 		});
