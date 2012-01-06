@@ -1,3 +1,5 @@
+var trip = false;
+
 /*
  * jQuery UI Selectable @VERSION
  *
@@ -171,6 +173,7 @@ $.widget("ui.selectable", $.ui.mouse, {
 		if(target.hasClass('ui-selected')){
 			selectee.startselected = true;
 		}
+		this.oposJQ = target;
 
 		/// unselecting selected, if no meta key
 		this.selectees.filter('.ui-selected').not(target).each(function() {
@@ -200,14 +203,31 @@ $.widget("ui.selectable", $.ui.mouse, {
 
 		var options = this.options;
 
-		// find top selectee ancestor of event.target
-		var target = $(event.target).parents().andSelf().filter(".ui-selectee").first();
-		var selectee = target.data("selectable-item");
-		if(target.hasClass('ui-selected')){
-			selectee.startselected = true;
-		}
-
 		var x1 = this.opos[0], y1 = this.opos[1], x2 = event.pageX, y2 = event.pageY;
+
+		var target;
+		this.selectees.each(function() {
+			var selectee = $.data(this, "selectable-item");
+			//prevent helper from being selected if appendTo: selectable
+			if (!selectee || selectee.element == self.element[0])
+				return;
+			if(!(selectee.left > x2 || selectee.right < x2 || selectee.top > y2 || selectee.bottom < y2)){
+				target = selectee.$element;
+				return false;
+			}
+		});
+		var index1 = this.oposJQ.index();
+		if (this.index2 === undefined) {
+			this.index2 = index1;
+		}
+		if (target) {
+			target = target.parents().andSelf().filter(".ui-selectee").first();
+			this.index2 = target.index();
+		}
+		var index2 = this.index2;
+
+		if (index1 > index2) { var tmp = index2; index2 = index1; index1 = tmp; }
+
 		if (x1 > x2) { var tmp = x2; x2 = x1; x1 = tmp; }
 		if (y1 > y2) { var tmp = y2; y2 = y1; y1 = tmp; }
 		this.helper.css({left: x1, top: y1, width: x2-x1, height: y2-y1});
@@ -222,6 +242,9 @@ $.widget("ui.selectable", $.ui.mouse, {
 				hit = ( !(selectee.left > x2 || selectee.right < x1 || selectee.top > y2 || selectee.bottom < y1) );
 			} else if (options.tolerance == 'fit') {
 				hit = (selectee.left > x1 && selectee.right < x2 && selectee.top > y1 && selectee.bottom < y2);
+			} else if (options.tolerance == 'sequence') {
+				index = selectee.$element.index();
+				hit = ((index >= index1) && (index <= index2));
 			}
 
 			if (hit) {
@@ -238,7 +261,7 @@ $.widget("ui.selectable", $.ui.mouse, {
 				}
 			}
 		});
-
+		
 		return false;
 	},
 
