@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>jQuery UI Selectable - Options demo</title>
+	<link rel="stylesheet" href="../../themes/base/jquery.ui.all.css">
+	<script src="../../jquery-1.7.1.js"></script>
+	<script src="../../ui/jquery.ui.core.js"></script>
+	<script src="../../ui/jquery.ui.widget.js"></script>
+	<script src="../../ui/jquery.ui.mouse.js"></script>
+	<script src="../../ui/jquery.ui.selectable.js"></script>
+	<link rel="stylesheet" href="../demos.css">
+	
+	<style>
+	#feedback { font-size: 1.4em; }
+	#selectable .ui-selecting { background: #FECA40; }
+	#selectable .ui-selected { background: #F39814; color: white; }
+	#selectable { list-style-type: none; margin: 0; padding: 0; }
+	#selectable li { margin: 3px; padding: 1px; float: left; width: 100px; height: 80px; font-size: 4em; text-align: center; }
+	</style>
+	<script>
+	$(function() {
+		$( "#selectable" ).selectable();
+		$('form#options input').click(function(){
+			if($(this).attr('type') === 'radio'){
+				$("#selectable").selectable("option", $(this).attr('name'), $(this).attr('id'));
+			} else {
+				$("#selectable").selectable("option", $(this).attr('name'), $(this).prop('checked'));
+			}
+		});
+	});
+	</script>
+</head>
+<body>
+
+<div class="demo">
+
+<ol id="selectable">
+	<li class="ui-state-default">1</li>
+	<li class="ui-state-default">2</li>
+	<li class="ui-state-default">3</li>
+	<li class="ui-state-default">4</li>
+	<li class="ui-state-default">5</li>
+	<li class="ui-state-default">6</li>
+	<li class="ui-state-default">7</li>
+	<li class="ui-state-default">8</li>
+	<li class="ui-state-default">9</li>
+	<li class="ui-state-default">10</li>
+	<li class="ui-state-default">11</li>
+	<li class="ui-state-default">12</li>
+</ol>
+
+<div>
+</div>
+
+</div><!-- End demo -->
+
+
+
+<div class="demo-description">
+<p>
+	Various new options:
+	<br /><b>'metaKeyAction':'invert'</b> changes selected items to opposite of their current state
+	<br /><b>'metaKeyAction':'smartInvert'</b> changes them to the opposite of the first item clicked in the selection action
+	<br /><b>'invertMeta':true</b> inverts the behavior of the control/command key
+</p>
+<form id=options>
+	tolerance
+	<input type="radio" name="tolerance" id="touch" checked />
+	<label for="touch">touch</label>
+	<input type="radio" name="tolerance" id="fit" />
+	<label for="fit">fit</label>
+	<input type="radio" name="tolerance" id="sequence" />
+	<label for="sequence">sequence</label>
+	<br />
+
+	<input type="checkbox" name="showHelper" id="showHelper" checked />
+	<label for="showHelper">showHelper</label><br />
+
+	<input type="checkbox" name="invertMeta" id="invertMeta" />
+	<label for="invertMeta">invertMeta</label><br />
+
+	metaKeyAction
+	<input type="radio" name="metaKeyAction" id="add" checked />
+	<label for="add">add</label>
+	<input type="radio" name="metaKeyAction" id="invert" />
+	<label for="invert">invert</label>
+	<input type="radio" name="metaKeyAction" id="smartInvert" />
+	<label for="smartInvert">smartInvert</label>
+	<input type="radio" name="metaKeyAction" id="remove" />
+	<label for="remove">remove</label>
+</form>
+</div><!-- End demo-description -->
+
+</body>
+</html>

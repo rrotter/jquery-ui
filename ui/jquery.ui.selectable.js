@@ -24,7 +24,9 @@ $.widget("ui.selectable", $.ui.mouse, {
 		distance: 0,
 		filter: '*',
 		tolerance: 'touch',
-		invertMeta: false
+		invertMeta: false,
+		metaKeyAction: 'add', // options 'add','invert','smartInvert','remove'
+		showHelper: true
 	},
 	_create: function() {
 		var self = this;
@@ -154,14 +156,16 @@ $.widget("ui.selectable", $.ui.mouse, {
 
 		this._trigger("start", event);
 
-		$(options.appendTo).append(this.helper);
-		// position helper (lasso)
-		this.helper.css({
-			"left": event.clientX,
-			"top": event.clientY,
-			"width": 0,
-			"height": 0
-		});
+		if(options.showHelper){
+			$(options.appendTo).append(this.helper);
+			// position helper (lasso)
+			this.helper.css({
+				"left": event.clientX,
+				"top": event.clientY,
+				"width": 0,
+				"height": 0
+			});
+		}
 
 		if (options.autoRefresh) {
 			this.refresh();
@@ -230,7 +234,11 @@ $.widget("ui.selectable", $.ui.mouse, {
 
 		if (x1 > x2) { var tmp = x2; x2 = x1; x1 = tmp; }
 		if (y1 > y2) { var tmp = y2; y2 = y1; y1 = tmp; }
-		this.helper.css({left: x1, top: y1, width: x2-x1, height: y2-y1});
+		if(options.showHelper){
+			this.helper.css({left: x1, top: y1, width: x2-x1, height: y2-y1});
+		}
+
+		var oposSelected = this.oposJQ.data("selectable-item").startselected;
 
 		this.selectees.each(function() {
 			var selectee = $.data(this, "selectable-item");
@@ -248,8 +256,10 @@ $.widget("ui.selectable", $.ui.mouse, {
 			}
 
 			if (hit) {
-				if (self.meta) {
+				if (self.meta && (options.metaKeyAction === 'invert')) {
 					self._invert(selectee);
+				} else if (self.meta && (options.metaKeyAction === 'remove' || (options.metaKeyAction === 'smartInvert' && oposSelected))) {
+					self._unselecting(selectee);
 				} else {
 					self._selecting(selectee);
 				}
